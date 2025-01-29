@@ -5,7 +5,8 @@ import random
 pygame.init()
 
 class Fruit:
-    def __init__(self,name, x, y,width, length, image, valeur,etat, letter):
+    
+    def __init__(self,name, x, y,width, length, image, valeur,etat, letter, goal):
         self.name = name
         self.x = x
         self.y = y
@@ -15,17 +16,19 @@ class Fruit:
         self.etat = etat
         self.valeur = valeur #score pour les fruits et valeur strike pour la bombe
         self.letter = letter
+        self.goal = goal
 
     def rect(self, screen, Black):
         pygame.draw.rect(screen, Black, (self.x, self.y , self.width, self.length))
         
     
     def apple_move_left_right(self):
+        print(self.goal)
         self.x +=0.10
         self.y -=0.10
-        if self.y == 0 and self.x :
-            self.x +=0.10
-            self.y -=0.10
+        if self.y <= 0 and self.x <= self.goal :
+            self.x += 0.10
+            self.y -= 1
         return self.x, self.y
     
 
@@ -45,13 +48,15 @@ my_Font = pygame.font.SysFont("comicsansms", 32)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BACKGROUND_COLOR = (50, 50, 150)  
-
+x_goal = random.randint(601,1125)
 letters =  ["z","q","s","d","o","k","l","m"]
 
 
-apple       = Fruit("apple",0, 600 , 75, 75, 'pasteque.png', 1,"pas couper",letter_tab(letters)  )
-pineapple   = Fruit("pineapple",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'pineapple.png', 1,"pas couper",letter_tab(letters))
-coconut     = Fruit("coconut",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'coconut.png', 1,"pas couper",letter_tab(letters))
+apple       = Fruit("apple",0, 600 , 75, 75, 'pasteque.png', 1,"pas couper",letter_tab(letters), x_goal  )
+pineapple   = Fruit("pineapple",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'pineapple.png', 1,"pas couper",letter_tab(letters), x_goal)
+coconut     = Fruit("coconut",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'coconut.png', 1,"pas couper",letter_tab(letters), x_goal)
+icecube   = Fruit("icecube",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'icecube.png', 1,"pas couper",letter_tab(letters), x_goal)
+bomb     = Fruit("bomb",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'bomb.png', 1,"pas couper",letter_tab(letters), x_goal)
 
 
 # Boucle principale
