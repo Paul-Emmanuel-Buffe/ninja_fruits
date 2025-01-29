@@ -21,9 +21,11 @@ class Fruit:
         
     
     def apple_move_left_right(self):
-        print("hello")
         self.x +=0.10
         self.y -=0.10
+        if self.y == 0 and self.x :
+            self.x +=0.10
+            self.y -=0.10
         return self.x, self.y
     
 
