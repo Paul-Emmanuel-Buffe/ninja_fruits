@@ -4,9 +4,9 @@ import os
 import sys
 
 # ways across the project
-BASE_DIR = r"C:/Users/Windows/Desktop/projets/1a/ninja_fruits"
-IMAGE_DIR = os.path.join(BASE_DIR, "images")
-SOUND_DIR = os.path.join(BASE_DIR, "sounds")
+#BASE_DIR = r"C:/Users/Windows/Desktop/projets/1a/ninja_fruits"
+#IMAGE_DIR = os.path.join(BASE_DIR, "images")
+#SOUND_DIR = os.path.join(BASE_DIR, "sounds")
 
 
 pygame.init()
@@ -23,14 +23,14 @@ BLACK = (0, 0, 0)
 BACKGROUND_COLOR = (50, 50, 150)  
 
 # Pictures
-back_ground_image  = pygame.image.load(os.path.join(IMAGE_DIR,"background_image.png"))
+back_ground_image  = pygame.image.load(os.path.join("images/background_image.png"))
 
 #fonts used
-ubuntu_font=pygame.font.Font(os.path.join(BASE_DIR, "Ubuntu-Regular.ttf"), 36)
+ubuntu_font=pygame.font.Font(os.path.join("Ubuntu-Regular.ttf"), 36)
 
 # sounds
 try:
-    back_ground_sound = pygame.mixer.Sound(r"C:\Users\Windows\Desktop\projets\1a\ninja_fruits\sounds\ninja.wav" )
+    back_ground_sound = pygame.mixer.Sound("sounds/ninja.wav" )
 except pygame.error as e:
     print(f"Error loading sound: {e}")
     back_ground_sound = None
