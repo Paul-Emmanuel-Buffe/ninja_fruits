@@ -1,6 +1,7 @@
 import pygame
 import random 
 
+# Initialisation de Pygame
 pygame.init()
 
 class Fruit:
@@ -21,64 +22,118 @@ def letter_tab(letters):
             
 class Apple(Fruit):
     ## Fruit.name est == a self.init
-    Fruit.name = "apple"
-    Fruit.x = random.randint(0, 1125)
-    Fruit.y= random.randint(0, 525)
-    Fruit.Width = 75
-    Fruit.length = 75
-    Fruit.letter = letter_tab(letters)
-    Fruit.etat = "pas couper"
-
-    def rect(x, y , width, length):
-           pygame.draw.rect()
+    def __init__(self):
+        self.name = "apple"
+        self.x = 0
+        self.y= 600
+        self.width = 75
+        self.length = 75
+        self.letter = letter_tab(letters)
+        self.etat = "pas couper"
+        self.goal1 = random.randint(601, 1025)
         
+
+    def rect(self, screen, Black):
+       return pygame.draw.rect(screen, Black, (self.x, self.y , self.width, self.length))
+
+    
+    def apple_move_left_right(self):
+        while self.x < 600 and self.y > 100:
+            self.x +=0.10
+            self.y -=0.10
+        return self.x, self.y
+            
+
+         
+
 class Pineapple(Fruit):
         Fruit.name = "pineapple"
-        Fruit.x = random.randint(0, 1125)
-        Fruit.y = random.randint(0, 525)
+        Fruit.x = 0
+        Fruit.y = 600
         Fruit.Width = 75
         Fruit.length = 75
         Fruit.letter = letter_tab(letters)
         Fruit.etat = "pas couper"
         print(Fruit.letter)
+
+        def rect(x, y , width, length):
+            return (x,y,width,length)
 
 class Coconut(Fruit):
         Fruit.name = "coconut"
-        Fruit.x = random.randint(0, 1125)
-        Fruit.y = random.randint(0, 525)
+        Fruit.x = 0
+        Fruit.y = 600
         Fruit.Width = 75
         Fruit.length = 75
         Fruit.letter = letter_tab(letters)
         Fruit.etat = "pas couper"
         print(Fruit.letter)
+
+        def rect(x, y , width, length):
+           return (x,y,width,length)
 
 class Bomb(Fruit):
         Fruit.name = "bomb"
-        Fruit.x = random.randint(0, 1125)
-        Fruit.y = random.randint(0, 525)
+        Fruit.x = 0
+        Fruit.y = 600
         Fruit.Width = 75
         Fruit.length = 75
         Fruit.letter = letter_tab(letters)
         Fruit.etat = "pas couper"
-        print(Fruit.letter)
         Fruit.valeur = 3 ## 3 strike
+
+
+        def rect(x, y , width, length):
+           return (x,y,width,length)
 
 class Icecube(Fruit):
         Fruit.name = "icecube"
-        Fruit.x = random.randint(0, 1125)
-        Fruit.y = random.randint(0, 525)
+        Fruit.x = 0
+        Fruit.y = 600
         Fruit.Width = 75
         Fruit.length = 75
         Fruit.letter = letter_tab(letters)
         Fruit.etat = "pas couper"
         print(Fruit.etat)
 
+        def rect(x, y , width, length):
+           return (x,y,width,length)
 
 
-Apple.rect(Fruit.x, Fruit.y, Fruit.width, Fruit.length)
+# Configuration de l'écran
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Projet Pygame - 1200x600")
+apple = Apple()
+# Couleurs
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BACKGROUND_COLOR = (50, 50, 150)  
+
+# Boucle principale
+running = True
+while running:
+    # Gestion des événements
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Affichage
+    screen.fill(BACKGROUND_COLOR)  # Remplir l'écran avec la couleur de fond
+
+    apple.rect(screen, BLACK)
+    apple.apple_move_left_right()
+    screen.blit(screen, (SCREEN_WIDTH,SCREEN_HEIGHT))
 
 
 
+    # Mettre à jour l'écran
+    pygame.display.flip()
+
+
+# Quitter Pygame proprement
+pygame.quit()
 
     
 
