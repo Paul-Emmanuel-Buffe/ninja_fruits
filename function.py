@@ -16,11 +16,9 @@ class Fruit:
         self.valeur = valeur #score pour les fruits et valeur strike pour la bombe
         self.letter = letter
 
-    def rect(self, screen, Black, font):
-        fruit = pygame.draw.rect(screen, Black, (self.x, self.y , self.width, self.length))
-        font_dis2 = font.render(self.letter, 1, WHITE)
-        font_rect2 = font_dis2.get_rect(center = fruit.center)
-        screen.blit(font_dis2, font_rect2)
+    def rect(self, screen, Black):
+        pygame.draw.rect(screen, Black, (self.x, self.y , self.width, self.length))
+        
     
     def apple_move_left_right(self):
         print("hello")
@@ -29,9 +27,8 @@ class Fruit:
         return self.x, self.y
     
 
-    letters =  ["z","q","s","d","o","k","l","m"]
-    def letter_tab(letters):
-        return letters[random.randint(0, len(letters)-1)]
+def letter_tab(letter):
+    return letter[random.randint(0, len(letter)-1)]
             
 
 # Configuration de l'écran
@@ -47,9 +44,13 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BACKGROUND_COLOR = (50, 50, 150)  
 
-apple       = Fruit("apple",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'pasteque.png', 1,  )
-pineapple   = Fruit()
-coconut     = Fruit()
+letters =  ["z","q","s","d","o","k","l","m"]
+
+
+apple       = Fruit("apple",0, 600 , 75, 75, 'pasteque.png', 1,"pas couper",letter_tab(letters)  )
+pineapple   = Fruit("pineapple",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'pineapple.png', 1,"pas couper",letter_tab(letters))
+coconut     = Fruit("coconut",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'coconut.png', 1,"pas couper",letter_tab(letters))
+
 
 # Boucle principale
 running = True
@@ -61,8 +62,8 @@ while running:
 
     # Affichage
     screen.fill(BACKGROUND_COLOR)  # Remplir l'écran avec la couleur de fond
-
-    
+    apple.rect(screen, BLACK)
+    apple.apple_move_left_right()
 
 
 
