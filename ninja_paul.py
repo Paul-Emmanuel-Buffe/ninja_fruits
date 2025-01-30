@@ -48,18 +48,24 @@ letters = ["z", "q", "s", "d", "o", "k", "l", "m"]
 
 # Classe Fruit
 class Fruit:
-    def __init__(self, image_name):
+    def __init__(self, image_name, image_cut_name):
         self.image = pygame.image.load(os.path.join(IMAGE_DIR, image_name))
+        self.cut_image = pygame.image.load(os.path.join(IMAGE_DIR, image_cut_name))
         self.rect = self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
         self.speed = random.randint(3, 5)
         self.letter = random.choice(letters)
+        self.cut = False
+    
     def move(self):
         self.rect.y -= self.speed
     
     def draw(self, screen):
-        screen.blit(self.image, self.rect)
-        letter_text = ubuntu_font.render(self.letter.upper(), True, BLACK)
-        screen.blit(letter_text, (self.rect.left - letter_text.get_width() - 10, self.rect.centery - letter_text.get_height() // 2))
+        if self.cut:
+            screen.blit(self.cut_image, self.rect)
+        else:
+            screen.blit(self.image, self.rect)
+            letter_text = ubuntu_font.render(self.letter.upper(), True, WHITE)
+            screen.blit(letter_text, (self.rect.left - letter_text.get_width() - 10, self.rect.centery - letter_text.get_height() // 2))
 
 # classe Bomb        
 class Bomb:
@@ -68,39 +74,46 @@ class Bomb:
         self.rect = self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
         self.speed = random.randint(3, 5)
         self.letter = random.choice(letters) 
-
+        self.cut = False
+        self.cut_time = 0
     
     def move(self):
         self.rect.y -= self.speed
     
     def draw(self, screen):
+        
         screen.blit(self.image, self.rect)
-        letter_text = ubuntu_font.render(self.letter.upper(), True, BLACK)
+        letter_text = ubuntu_font.render(self.letter.upper(), True, WHITE)
         screen.blit(letter_text, (self.rect.left - letter_text.get_width() - 10, self.rect.centery - letter_text.get_height() // 2))
 
 class Icecube:
     def __init__(self):
         self.image = pygame.image.load(os.path.join(IMAGE_DIR, "icecube.png"))
+        self.cut_image = pygame.image.load(os.path.join(IMAGE_DIR, "ice_cut2.png"))
         self.rect =self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
         self.speed = random.randint(3,6)
         self.letter = random.choice(letters)
-
+        self.cut = False
+        self.cut_time = 0
     def move (self):
         self.rect.y -= self.speed
     
     def draw(self, screen):
-        screen.blit(self.image, self.rect)
-        letter_text = ubuntu_font.render(self.letter.upper(), True, BLACK)
-        screen.blit(letter_text, (self.rect.left - letter_text.get_width() - 10, self.rect.centery - letter_text.get_height() // 2))
+        if self.cut:
+            screen.blit(self.cut_image, self.rect)
+        else:
+            screen.blit(self.image, self.rect)
+            letter_text = ubuntu_font.render(self.letter.upper(), True, WHITE)
+            screen.blit(letter_text, (self.rect.left - letter_text.get_width() - 10, self.rect.centery - letter_text.get_height() // 2))
 
 
 def select_random_object():
     
     objects_list = [
-    Fruit("apple.png"),
-    Fruit("pineapple.png"),
-    Fruit("coconut.png"),
-    Fruit("banana.png"),
+    Fruit("apple.png", "apple_cut2.png"),
+    Fruit("pineapple.png", "pineapple_cut2.png"),
+    Fruit("coconut.png", "coco_cut2.png"),
+    Fruit("banana.png", "banana_cut2.png"),
     Bomb(),
     Icecube()]
 
@@ -131,7 +144,7 @@ def main():
         remaining_time = max(0, game_duration - elapsed_time) 
         minutes = remaining_time // 60000
         seconds = (remaining_time // 1000) % 60
-        time_text = ubuntu_font.render(f"{minutes:02}:{seconds:02}", True, BLACK)
+        time_text = ubuntu_font.render(f"{minutes:02}:{seconds:02}", True, WHITE)
         screen.blit(time_text, (SCREEN_WIDTH - time_text.get_width() - 10, 10))
         
         if remaining_time == 0 and not game_over:
@@ -145,8 +158,13 @@ def main():
                 if pressed_key.isalpha() and len(pressed_key) == 1:
                     for obj in objects:
                         if obj.letter == pressed_key:
-                            objects.remove(obj)
                             if isinstance(obj, Fruit):
+                                obj.cut = True
+                                obj.cut_time = pygame.time.get_ticks()
+                                score += 1
+                            elif isinstance(obj, Icecube):
+                                obj.cut = True
+                                obj.cut_time = pygame.time.get_ticks()
                                 score += 1
                             else:
                                 game_over = True  
@@ -155,10 +173,16 @@ def main():
         if not game_over:
             if random.randint(1, 60) == 1:
                 objects.append(select_random_object())
+
+                
             
             for obj in objects[:]:
                 obj.move()
                 obj.draw(screen)
+                
+                if obj.cut and pygame.time.get_ticks() - obj.cut_time > 1000:  # Supprimer après 0.5 sec
+                    objects.remove(obj)
+
                 if obj.rect.bottom < 0:
                     objects.remove(obj)
                     if isinstance(obj, Fruit):
@@ -170,7 +194,14 @@ def main():
             lose_text = LARGE_FONT.render("You Lose", True, RED)
             screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
             
-                        
+                
+        for obj in objects:
+            if isinstance(obj, Icecube) and obj.cut:
+                if pygame.time.get_ticks() - obj.cut_time < 3000:  
+                    pygame.display.flip()  
+                    pygame.time.delay(3000)   
+                break  
+                
         score_text = ubuntu_font.render(f"Score: {score}", True, BLACK)
         screen.blit(score_text, (10, 10))
         
