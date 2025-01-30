@@ -7,23 +7,71 @@ import json
 # Initialisation de Pygame
 pygame.init()
 
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 600
+background_image = pygame.image.load(os.path.join('images', 'background.jpeg')) 
+background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Fruit Ninja")
+
+# Couleurs
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+# sounds
+try:
+    back_ground_sound = pygame.mixer.Sound("sounds/ninja.wav" )
+except pygame.error as e:
+    print(f"Error loading sound: {e}")
+    back_ground_sound = None
+
+FRUIT_IMAGES = []
+for img_name in ['apple.png', 'banana.png', 'orange.png']:
+    img = pygame.image.load(os.path.join('images', img_name))
+    FRUIT_IMAGES.append(pygame.transform.scale(img, (50, 50)))
+
+BOMB_IMAGE = pygame.image.load(os.path.join('images', 'bomb.jpeg'))
+BOMB_IMAGE = pygame.transform.scale(BOMB_IMAGE, (50, 50))
+try:
+    ubuntu_font = pygame.font.Font(os.path.join("Ubuntu-Regular.ttf"), 36)
+except FileNotFoundError:
+    print("La police n'a pas été trouvée. Utilisation de la police par défaut.")
+    ubuntu_font = pygame.font.Font(None, 36)
+LARGE_FONT = pygame.font.Font(None, 72)
+
+letters = ["z", "q", "s", "d", "o", "k", "l", "m"]
+# Classe Fruit
 class Fruit:
-    def __init__(self,name, x, y,width, length, image, valeur,etat, letter, goal):
-        self.name = name
-        self.x = x
-        self.y = y
-        self.width = width
-        self.length = length
-        self.image = image
-        self.etat = etat
-        self.valeur = valeur #score pour les fruits et valeur strike pour la bombe
-        self.letter = letter
-        self.goal = goal
+    def __init__(self):
+        self.image = random.choice(FRUIT_IMAGES)
+        self.rect = self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
+        self.speed = random.randint(3, 5)
+        self.letter = random.choice(letters)
+    
+    def move(self):
+        self.rect.y -= self.speed
+    
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+        letter_text = ubuntu_font.render(self.letter.upper(), True, BLACK)
+        screen.blit(letter_text, (self.rect.left - letter_text.get_width() - 10, self.rect.centery - letter_text.get_height() // 2))
+# classe Bomb        
+class Bomb:
+    def __init__(self):
+        self.image = BOMB_IMAGE
+        self.rect = self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
+        self.speed = random.randint(3, 5)
+        self.letter = random.choice(letters) 
+    
+    def move(self):
+        self.rect.y -= self.speed
+    
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+        letter_text = ubuntu_font.render(self.letter.upper(), True, BLACK)
+        screen.blit(letter_text, (self.rect.left - letter_text.get_width() - 10, self.rect.centery - letter_text.get_height() // 2))
 
-    def rect(self, screen, Black):
-        pygame.draw.rect(screen, Black, (self.x, self.y , self.width, self.length))
-
-            
+           
 def Main_menu(screen, image, r1, r2, r3,  font, white, yellow):
     ng = "new game"
     history = "score history"
