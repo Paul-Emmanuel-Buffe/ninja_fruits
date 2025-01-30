@@ -9,7 +9,7 @@ pygame.init()
 
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 600
-background_image = pygame.image.load(os.path.join('images', 'background.jpeg')) 
+background_image = pygame.image.load(os.path.join('images', 'background_image.png')) 
 background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Fruit Ninja")
@@ -26,11 +26,11 @@ except pygame.error as e:
     back_ground_sound = None
 
 FRUIT_IMAGES = []
-for img_name in ['apple.png', 'banana.png', 'orange.png']:
+for img_name in ['apple.jpg', 'banana.jpg', 'orange.png']:
     img = pygame.image.load(os.path.join('images', img_name))
     FRUIT_IMAGES.append(pygame.transform.scale(img, (50, 50)))
 
-BOMB_IMAGE = pygame.image.load(os.path.join('images', 'bomb.jpeg'))
+BOMB_IMAGE = pygame.image.load(os.path.join('images', 'bomb.jpg'))
 BOMB_IMAGE = pygame.transform.scale(BOMB_IMAGE, (50, 50))
 try:
     ubuntu_font = pygame.font.Font(os.path.join("Ubuntu-Regular.ttf"), 36)
@@ -40,12 +40,13 @@ except FileNotFoundError:
 LARGE_FONT = pygame.font.Font(None, 72)
 
 letters = ["z", "q", "s", "d", "o", "k", "l", "m"]
+
 # Classe Fruit
 class Fruit:
-    def __init__(self):
+    def __init__(self, speed):
         self.image = random.choice(FRUIT_IMAGES)
         self.rect = self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
-        self.speed = random.randint(3, 5)
+        self.speed = speed
         self.letter = random.choice(letters)
     
     def move(self):
@@ -96,8 +97,6 @@ def Main_menu(screen, image, r1, r2, r3,  font, white, yellow):
 
     pygame.display.update()  
 
-
-
 def level_difficulty(screen, image, r1, r2, r3, font, white, yellow):
     easy = "easy"
     normal = "normal"
@@ -123,11 +122,84 @@ def level_difficulty(screen, image, r1, r2, r3, font, white, yellow):
     pygame.display.update()  
 
 
-def New_Game(screen, image, r1, r2,font, white):
+def New_Game(screen, start_time, game_duration, fruits, bombs, score, game_over, missed_fruits, timer):
+    # Calcul du temps écoulé
+        running = True
+        while running:
+            if not game_over:
+                elapsed_time = pygame.time.get_ticks() - start_time
+                remaining_time = max(0, game_duration - elapsed_time) 
+            
+                # Convertir le temps restant en minutes et secondes
+                minutes = remaining_time // 60000
+                seconds = (remaining_time // 1000) % 60
+            time_text = ubuntu_font.render(f"{minutes:02}:{seconds:02}", True, BLACK)
+            screen.blit(time_text, (SCREEN_WIDTH - time_text.get_width() - 10, 10))
+            
+            if remaining_time == 0 and not game_over:
+                game_over = True
+                congrats_text = LARGE_FONT.render("Congratulations!", True, RED)
+                screen.blit(congrats_text, (SCREEN_WIDTH // 2 - congrats_text.get_width() // 2, SCREEN_HEIGHT // 2 - congrats_text.get_height() // 2))
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN and not game_over:
+                    pressed_key = pygame.key.name(event.key)
+                    if pressed_key.isalpha() and len(pressed_key) == 1:  
+                        for fruit in fruits:
+                            if fruit.letter == pressed_key:
+                                fruits.remove(fruit)
+                                score += 1
+                                break  
+                        for bomb in bombs:
+                            if bomb.letter == pressed_key:  
+                                game_over = True  
+                                break 
+                            
+            if not game_over:
+                if random.randint(1, 60) == 1:
+                    fruits.append(Fruit())
+                
+                if random.randint(1, 120) == 1:
+                    bombs.append(Bomb())    
+                
+                for fruit in fruits:
+                    fruit.move()
+                    fruit.draw(screen)
+                    if fruit.rect.bottom < 0:
+                        fruits.remove(fruit)
+                        missed_fruits += 1
+                        if missed_fruits >= 3:
+                            print(missed_fruits)
+                            game_over = True
+                for bomb in bombs:
+                    bomb.move()
+                    bomb.draw(screen)
+                    if bomb.rect.bottom < 0: 
+                        bombs.remove(bomb)
+            
+            if game_over and remaining_time > 0: 
+                lose_text = LARGE_FONT.render("You Lose", True, RED)
+                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
+                
+                            
+            score_text = ubuntu_font.render(f"Score: {score}", True, BLACK)
+            screen.blit(score_text, (10, 10))
+            
+            missed_text = ubuntu_font.render(f"Missed: {missed_fruits}", True, BLACK)
+            screen.blit(missed_text, (10, 50))
+            
+            if game_over:
+                lose_text = LARGE_FONT.render("You Lose", True, RED)
+                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
+        
+            pygame.display.update()
+            
+        timer.tick(30)
+        pygame.quit()
 
-    
-    pygame.Surface.blit(screen, image, (0,0))
-    pygame.display.update()  
+        
 
 def Score(screen, image, rect,font, white,yellow, BASE_DIR):
     score = scores_history(BASE_DIR)
@@ -173,10 +245,23 @@ def main():
     Main_Menu = 0
     new_game = 1
     difficulty = 2
-    score = 3
+    score_hist = 3
     Exit = 4
     state_screen = Main_Menu
     BASE_DIR = r"C:\Users\alexc\Desktop\laplateforme\projet\annee1\ninja_fruits"
+
+    back_ground_sound.play(-1)
+    timer = pygame.time.Clock()
+    fruits = []
+    bombs = []
+    score = 0
+    missed_fruits = 0
+    running = True
+    game_over = False
+    # Initialisation du chrono
+    start_time = pygame.time.get_ticks()
+    game_duration = 60000
+
 
     # Couleurs
     YELLOW =(253, 165,15)
@@ -188,14 +273,7 @@ def main():
     image = pygame.image.load(os.path.join('images\\background_image.png')).convert()
 
 
-    letters =  ["z","q","s","d","o","k","l","m"]
-
-
-    apple       = Fruit("apple",random.randint(0, 1125), 600 , 75, 75, 'pasteque.png', 1,"pas couper",letter_tab(letters), random.randint(601,1125)  )
-    pineapple   = Fruit("pineapple",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'pineapple.png', 1,"pas couper",letter_tab(letters), random.randint(601,1125))
-    coconut     = Fruit("coconut",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'coconut.png', 1,"pas couper",letter_tab(letters), random.randint(601,1125))
-    icecube   = Fruit("icecube",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'icecube.png', 1,"pas couper",letter_tab(letters), random.randint(601,1125))
-    bomb     = Fruit("bomb",SCREEN_WIDTH, SCREEN_HEIGHT,75,75, 'bomb.png', 1,"pas couper",letter_tab(letters), random.randint(601,1125))
+   
 
     # Boucle principale
     running = True
@@ -212,7 +290,7 @@ def main():
                 if state_screen == Main_Menu and rect1.collidepoint(event.pos):
                     state_screen = difficulty
                 elif state_screen == Main_Menu and rect2.collidepoint(event.pos):
-                    state_screen = score
+                    state_screen = score_hist
                 elif state_screen == Main_Menu and rect3.collidepoint(event.pos):
                     state_screen= Exit
                 elif state_screen == difficulty:
@@ -229,8 +307,8 @@ def main():
         elif state_screen == difficulty:
             level_difficulty(screen, image, rect1, rect2, rect3, Font, WHITE, YELLOW)
         elif state_screen == new_game:
-            New_Game(screen, image, rect1, rect2, Font, WHITE)
-        elif state_screen == score:
+            New_Game(screen, start_time, game_duration, fruits, bombs, score, game_over, missed_fruits, timer)
+        elif state_screen == score_hist:
             Score(screen, image, rect4,Font, WHITE,YELLOW, BASE_DIR)
         elif state_screen == Exit:
             pygame.quit()
@@ -239,7 +317,6 @@ def main():
         
         # Mettre à jour l'écran
         pygame.display.flip()
-
 
     # Quitter Pygame proprement
     pygame.quit()
