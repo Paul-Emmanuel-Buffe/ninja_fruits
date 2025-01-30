@@ -131,8 +131,6 @@ def main():
     state_screen = Main_Menu
     BASE_DIR = r"C:\Users\alexc\Desktop\laplateforme\projet\annee1\ninja_fruits"
 
-
-
     # Couleurs
     YELLOW =(253, 165,15)
     BROWN =(129, 93, 61)
