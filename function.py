@@ -8,7 +8,6 @@ import json
 pygame.init()
 
 class Fruit:
-    
     def __init__(self,name, x, y,width, length, image, valeur,etat, letter, goal):
         self.name = name
         self.x = x
