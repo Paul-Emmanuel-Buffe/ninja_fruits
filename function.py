@@ -196,6 +196,23 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
             time_text = ubuntu_font.render(f"{minutes:02}:{seconds:02}", True, WHITE)
             screen.blit(time_text, (SCREEN_WIDTH - time_text.get_width() - 10, 10))
             
+
+
+            if score > 0 and remaining_time == 0:
+                running = False
+                win_text = LARGE_FONT.render("You Win", True, RED)
+                screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 2 - win_text.get_height() // 2))
+                
+            if game_over and remaining_time > 0: 
+                running = False
+                lose_text = LARGE_FONT.render("You Lose", True, RED)
+                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
+            
+            if game_over:
+                running = False
+                lose_text = LARGE_FONT.render("You Lose", True, RED)
+                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
+
             if remaining_time == 0 and not game_over:
                 game_over = True
             
@@ -218,11 +235,7 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                                 else:
                                     game_over = True  
                                 break 
-            if game_over == False:
-                if score > 0 and remaining_time == 0:
-                    win_text = LARGE_FONT.render("You Win", True, RED)
-                    screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 2 - win_text.get_height() // 2))
-                    running = False
+            
             if not game_over:
                 if random.randint(1, 60) == 1:
                     objects.append(select_random_object(speed))
@@ -257,14 +270,7 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
             missed_text = ubuntu_font.render(f"Missed: {missed_fruits}", True, BLACK)
             screen.blit(missed_text, (10, 50))
 
-            if game_over and remaining_time > 0: 
-                lose_text = LARGE_FONT.render("You Lose", True, RED)
-                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
             
-            if game_over:
-                lose_text = LARGE_FONT.render("You Lose", True, RED)
-                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
-
             
             pygame.display.flip()
             timer.tick(30)
