@@ -50,7 +50,7 @@ except FileNotFoundError:
     ubuntu_font = pygame.font.Font(None, 36)
 LARGE_FONT = pygame.font.Font(None, 72)
 
-letters = ["z", "q", "s", "d", "o", "k", "l", "m"]
+letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 
 
 # Classe Fruit
