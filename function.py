@@ -185,7 +185,7 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
     running = True
     game_over = False
     start_time = pygame.time.get_ticks()
-    game_duration = 60000 
+    game_duration = 10000 
     
     while running:
             screen.blit(background_image, (0, 0))
@@ -218,7 +218,11 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                                 else:
                                     game_over = True  
                                 break 
-            
+            if game_over == False:
+                if score > 0 and remaining_time == 0:
+                    win_text = LARGE_FONT.render("You Win", True, RED)
+                    screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 2 - win_text.get_height() // 2))
+                    running = False
             if not game_over:
                 if random.randint(1, 60) == 1:
                     objects.append(select_random_object(speed))
@@ -238,10 +242,7 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                             if missed_fruits >= 3:
                                 game_over = True
             
-            if game_over and remaining_time > 0: 
-                lose_text = LARGE_FONT.render("You Lose", True, RED)
-                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
-                
+            
                     
             for obj in objects:
                 if isinstance(obj, Icecube) and obj.cut:
@@ -255,11 +256,16 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
             
             missed_text = ubuntu_font.render(f"Missed: {missed_fruits}", True, BLACK)
             screen.blit(missed_text, (10, 50))
+
+            if game_over and remaining_time > 0: 
+                lose_text = LARGE_FONT.render("You Lose", True, RED)
+                screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
             
             if game_over:
                 lose_text = LARGE_FONT.render("You Lose", True, RED)
                 screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
-        
+
+            
             pygame.display.flip()
             timer.tick(30)
     pygame.quit()
@@ -351,13 +357,13 @@ def main():
             level_difficulty(screen, image, rect1, rect2, rect3, Font, WHITE, YELLOW)
         elif state_screen == new_game and rect1.collidepoint(event.pos):
                 ##vitesse du fruit
-                speed = random.randint(1,3)
+                speed = random.randint(2,4)
                 New_Game(screen,image, start_time, game_duration,  score, game_over, missed_fruits,speed)
         elif state_screen == new_game and rect2.collidepoint(event.pos):
-                speed= random.randint(4,6)
+                speed= random.randint(5,7)
                 New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed)
         elif state_screen == new_game and rect3.collidepoint(event.pos):
-                speed= random.randint(6,8)
+                speed= random.randint(7,9)
                 New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed)
         elif state_screen == score_hist:
             Score(screen, image, rect4,Font, WHITE,YELLOW, BASE_DIR)
