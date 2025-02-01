@@ -280,31 +280,39 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                 pygame.display.flip()
                 pygame.time.delay(2000)  
                 record_history(score, player_name)
+                back_ground_sound.stop()
+                sword_3.play()
                 main()
             if game_over and remaining_time > 0: 
                 running = False
                 lose_text = LARGE_FONT.render("You Lose", True, RED)
                 screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
                 pygame.display.flip()
+                back_ground_sound.stop()
                 pygame.time.delay(2000)  
                 record_history(score, player_name)
+                sword_3.play()
                 main()
             if game_over:
                 running = False
                 lose_text = LARGE_FONT.render("You Lose", True, RED)
                 screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
                 pygame.display.flip()
+                back_ground_sound.stop()
                 pygame.time.delay(2000)  
                 record_history(score, player_name)
+                sword_3.play()
                 main()
             
             if remaining_time == 0 and not game_over:
                 game_over = True
                 pygame.display.flip()
                 pygame.time.delay(2000)  
+                back_ground_sound.stop()
+                pygame.time.delay(2000)  
                 record_history(score, player_name)
+                sword_3.play()
                 main()
-            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -444,7 +452,6 @@ def main():
     score_hist = 3
     Exit = 4
     state_screen = Main_Menu
-
     back_ground_sound.play(-1)
     
     score = 0
