@@ -287,7 +287,7 @@ def New_Game(screen, image, start_time, game_duration, score, game_over, missed_
             screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 2 - win_text.get_height() // 2))
             pygame.display.flip()
             pygame.time.delay(2000)  
-            record_history(score, player_name)
+            record_history(score, player_name, BASE_DIR)
             back_ground_sound.stop()
             sword_3.play()
             main()
@@ -299,7 +299,7 @@ def New_Game(screen, image, start_time, game_duration, score, game_over, missed_
             pygame.display.flip()
             back_ground_sound.stop()
             pygame.time.delay(2000)  
-            record_history(score, player_name)
+            record_history(score, player_name, BASE_DIR)
             sword_3.play()
             main()
         
@@ -310,7 +310,7 @@ def New_Game(screen, image, start_time, game_duration, score, game_over, missed_
             pygame.display.flip()
             back_ground_sound.stop()
             pygame.time.delay(2000)  
-            record_history(score, player_name)
+            record_history(score, player_name, BASE_DIR)
             sword_3.play()
             main()
         
@@ -320,7 +320,7 @@ def New_Game(screen, image, start_time, game_duration, score, game_over, missed_
             pygame.time.delay(2000)  
             back_ground_sound.stop()
             pygame.time.delay(2000)  
-            record_history(score, player_name)
+            record_history(score, player_name, BASE_DIR)
             sword_3.play()
             main()
 
@@ -416,31 +416,44 @@ def scores_history(BASE_DIR):
 
 
 
-def Score(screen, image, rect, ubuntu_font, WHITE, YELLOW, BASE_DIR): 
+def Score(screen, image, rect, ubuntu_font, WHITE, YELLOW, BASE_DIR):
     score = scores_history(BASE_DIR)
     vertical_pos = rect.top + 0
     pygame.Surface.blit(screen, image, (0, 0))
 
+    # Affichage du titre "SCORE BOARD"
     title_text = LARGE_FONT.render("SCORE BOARD", True, WHITE)
     title_rect = title_text.get_rect(center=(rect.centerx, rect.top + 0))
     screen.blit(title_text, title_rect)
     vertical_pos += 60
     
+    # Affichage des scores
     for i, score_text in enumerate(score):
         font_score = ubuntu_font.render(score_text, True, WHITE)
         font_rect = font_score.get_rect(midtop=(rect.centerx, vertical_pos))
         screen.blit(font_score, font_rect)
         vertical_pos += 40
 
+    # Création du bouton "Retour au menu"
+    button_width = 200
+    button_height = 50
+    back_button_rect = pygame.Rect(10, screen.get_height() - button_height - 10, button_width, button_height)
+    pygame.draw.rect(screen, YELLOW, back_button_rect)
+    
+    # Texte du bouton
+    back_button_text = ubuntu_font.render("Retour au menu", True, WHITE)
+    back_button_text_rect = back_button_text.get_rect(center=back_button_rect.center)
+    screen.blit(back_button_text, back_button_text_rect)
 
     pygame.display.update()
 
-
-    pygame.display.update()
-
-
-
-
+    # Gestion des événements de clic
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if back_button_rect.collidepoint(event.pos):
+                back_ground_sound.stop()
+                sword_1.play()
+                main()
 
 def add_points(score_container, player_name, points):
     for element in score_container:
@@ -551,11 +564,14 @@ def main():
                 speed = random.randint(7, 9)
                 New_Game(screen, image, start_time, game_duration, score, game_over, missed_fruits, speed, player_name)
         elif state_screen == score_hist:
-            Score(screen, image, rect4, ubuntu_font, WHITE, YELLOW, BASE_DIR)
+            result = Score(screen, image, rect4, ubuntu_font, WHITE, YELLOW, BASE_DIR)
+            if result == "Main_Menu":
+                state_screen = Main_Menu
         elif state_screen == Exit:
             running = False
             pygame.quit()
             sys.exit()
+
 
     pygame.display.update()  
     # Quit Pygame properly
