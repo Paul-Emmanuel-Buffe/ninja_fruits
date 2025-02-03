@@ -163,15 +163,23 @@ def letter_tab(letter):
     return letter[random.randint(0, len(letter)-1)]       
 
 # Menu with: Language choice, game and go to scoreboard
-def Main_menu(screen, image, r1, r2, r3,  font, white, yellow, language,language_rect ):
-    
+def Main_menu(screen, image, r1, r2, r3, font, white, yellow, language, language_rect):
+    # Texte pour les boutons en fonction de la langue
     ng = texts[language]["new_game"]
     history = texts[language]["score_history"]
     exit_text = texts[language]["exit"]
     language_text = texts[language]["language"]
 
+    # Afficher l'image de fond
     pygame.Surface.blit(screen, image, (0, 0))
 
+    # Dessiner le titre "Fruits Slicer"
+    title_font = pygame.font.Font(None, 74)  # Vous pouvez ajuster la taille de la police
+    title_text = LARGE_FONT.render("Fruits Slicer", 1, white)
+    title_rect = title_text.get_rect(center=(screen.get_width() // 2, 100))  # Position du titre
+    screen.blit(title_text, title_rect)
+
+    # Dessiner les boutons
     pygame.draw.rect(screen, yellow, r1)
     font_dis = font.render(ng, 1, white)
     font_rect = font_dis.get_rect(center=r1.center)
@@ -183,18 +191,19 @@ def Main_menu(screen, image, r1, r2, r3,  font, white, yellow, language,language
     screen.blit(font_dis2, font_rect2)
 
     pygame.draw.rect(screen, yellow, r3)
-    font_dis3 = font.render(exit_text, 1, white)  # Correction ici
-    font_rect3 = font_dis3.get_rect(center=r3.center)  # Correction ici
-    screen.blit(font_dis3, font_rect3)  # Correction ici
+    font_dis3 = font.render(exit_text, 1, white)
+    font_rect3 = font_dis3.get_rect(center=r3.center)
+    screen.blit(font_dis3, font_rect3)
 
+    # Dessiner le bouton de langue
     language_rect = pygame.Rect(10, 10, 150, 50)
     pygame.draw.rect(screen, yellow, language_rect)
     font_dis_lang = font.render(language_text, 1, white)
     font_rect_lang = font_dis_lang.get_rect(center=language_rect.center)
     screen.blit(font_dis_lang, font_rect_lang)
 
-    pygame.display.update() 
-
+    # Mettre à jour l'affichage
+    pygame.display.update()
 
 
 def level_difficulty(screen, image, r1, r2, r3, font, white, yellow):
