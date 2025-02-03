@@ -72,7 +72,8 @@ texts = {
         "you_lose": "You Lose",
         "enter_name": "Enter your name:",
         "return_menu": "Return menu",
-        "score_board": "SCORE BOARD"
+        "score_board": "SCORE BOARD",
+        "missed" : "Missed"
     },
     "fr": {
         "new_game": "Nouvelle Partie",
@@ -80,10 +81,11 @@ texts = {
         "exit": "Quitter",
         "language": "EN",
         "you_win": "Vous avez gagné", 
-        "You_lose": "Vous avec perdu" ,
+        "you_lose": "Vous avec perdu" ,
         "enter_name": "Entrez votre nom :", 
         "return_menu": "Retour menu",
-        "score_board": "TABLEAU SCORES"
+        "score_board": "TABLEAU SCORES",
+        "missed" : "Loupés"
     }
 }
 
@@ -343,6 +345,7 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                 record_history(score, player_name)
                 sword_3.play()
                 main()
+            
             if game_over:
                 running = False
                 lose_text = LARGE_FONT.render(texts[language]["you_lose"], True, RED)
@@ -437,10 +440,11 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
 
 
             
-            score_text = ubuntu_font.render(f"Score: {score}", True, BLACK)
+            score_text = ubuntu_font.render(f"Score: {score}", True, WHITE)
             screen.blit(score_text, (10, 10))
             
-            missed_text = ubuntu_font.render(f"Missed: {missed_fruits}", True, BLACK)
+            missed_text = ubuntu_font.render(texts[language]["missed"] + " : " + str(missed_fruits), True, WHITE)
+
             screen.blit(missed_text, (10, 50))
            
             if display_combo:
@@ -620,7 +624,7 @@ def main():
  
                 New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed,player_name, language)
         elif state_screen == new_game and rect3.collidepoint(event.pos):
-                player_name = get_player_name()
+                player_name = get_player_name(language)
                 speed= random.randint(7,9)
 
                 New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed, player_name, language)
