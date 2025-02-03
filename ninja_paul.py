@@ -197,8 +197,61 @@ def select_random_object(speed):
 
     return choosen_object
 
+
+
+def get_player_name():
+    image = pygame.image.load(os.path.join(IMAGE_DIR, 'background.png')).convert()
+    image = pygame.transform.scale(image, (SCREEN_WIDTH, SCREEN_HEIGHT))  # Adapter l'image à l'écran
+    
+    input_box = pygame.Rect(SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2, 300, 50)  # Centrer la zone de saisie
+    color_inactive = pygame.Color('lightskyblue3')
+    color_active = pygame.Color('dodgerblue2')
+    color = color_inactive
+    active = False
+    text = ''
+    user_name = ''
+
+    font = pygame.font.Font(None, 50)  # Police plus grande
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                active = input_box.collidepoint(event.pos)
+                color = color_active if active else color_inactive
+            
+            if event.type == pygame.KEYDOWN and active:
+                if event.key == pygame.K_RETURN:
+                    return text
+                elif event.key == pygame.K_BACKSPACE:
+                    text = text[:-1]
+                else:
+                    text += event.unicode
+
+        # Afficher l'image de fond
+        screen.blit(image, (0, 0))
+
+        # Afficher le texte "Enter your name:" en blanc et centré
+        prompt_text = font.render("Enter your name:", True, (255, 255, 255))  # Blanc
+        screen.blit(prompt_text, ((SCREEN_WIDTH - prompt_text.get_width()) // 2, SCREEN_HEIGHT // 3))
+
+        # Afficher le texte saisi
+        txt_surface = font.render(text, True, (255, 255, 255))  # Blanc
+        input_box.w = max(300, txt_surface.get_width() + 10)
+        screen.blit(txt_surface, (input_box.x + 5, input_box.y + 5))
         
-def New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits, speed):
+        # Dessiner la bordure de la zone de saisie
+        pygame.draw.rect(screen, color, input_box, 2)
+
+        pygame.display.flip()
+        pygame.time.Clock().tick(30)
+
+
+        
+def New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits, speed, player_name):
     # Calcul du temps écoulé
     timer = pygame.time.Clock()
     objects = []
@@ -207,7 +260,7 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
     running = True
     game_over = False
     start_time = pygame.time.get_ticks()
-    game_duration = 10000 
+    game_duration = 100000 
     
     while running:
             screen.blit(background_image, (0, 0))
@@ -224,19 +277,33 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                 running = False
                 win_text = LARGE_FONT.render("You Win", True, RED)
                 screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 2 - win_text.get_height() // 2))
-                
+                pygame.display.flip()
+                pygame.time.delay(2000)  
+                record_history(score, player_name)
+                main()
             if game_over and remaining_time > 0: 
                 running = False
                 lose_text = LARGE_FONT.render("You Lose", True, RED)
                 screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
-            
+                pygame.display.flip()
+                pygame.time.delay(2000)  
+                record_history(score, player_name)
+                main()
             if game_over:
                 running = False
                 lose_text = LARGE_FONT.render("You Lose", True, RED)
                 screen.blit(lose_text, (SCREEN_WIDTH // 2 - lose_text.get_width() // 2, SCREEN_HEIGHT // 2 - lose_text.get_height() // 2))
-
+                pygame.display.flip()
+                pygame.time.delay(2000)  
+                record_history(score, player_name)
+                main()
+            
             if remaining_time == 0 and not game_over:
                 game_over = True
+                pygame.display.flip()
+                pygame.time.delay(2000)  
+                record_history(score, player_name)
+                main()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -251,12 +318,15 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                                     obj.cut = True
                                     obj.cut_time = pygame.time.get_ticks()
                                     score += 1
+                                    
                                 elif isinstance(obj, Icecube):
                                     obj.cut = True
                                     obj.cut_time = pygame.time.get_ticks()
                                     score += 1
+                                    
                                 else:
                                     game_over = True  
+
                                 break 
             
             if not game_over:
@@ -271,17 +341,18 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                     if obj.cut and pygame.time.get_ticks() - obj.cut_time > 500:  
                             if obj.letter not in letters:
                                 letters.append(obj.letter)
-                            objects.remove(obj)
+                                objects.remove(obj)
 
 
                     if obj.rect.bottom < 0:
                             if isinstance(obj, Fruit):
+                                missed_fruits += 1
                                 if missed_fruits >= 3:
                                     game_over = True
                             
                             if obj.letter not in letters:
                                 letters.append(obj.letter)
-                            objects.remove(obj)
+                                objects.remove(obj)
 # FIN MODIFICATIONS           
             
                     
@@ -304,7 +375,13 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
             timer.tick(30)
     pygame.quit()
 
-        
+def scores_history(BASE_DIR):
+    score_hist= []
+    with open (os.path.join(BASE_DIR,"score.json"), "r") as f:
+            player_list= json.load(f)      
+    for i, player in enumerate(player_list):
+       score_hist.append(f'{i+1}. {player["name"]} => {player["score"]}')
+    return score_hist        
 
 def Score(screen, image, rect,font, white,yellow, BASE_DIR):
     score = scores_history(BASE_DIR)
@@ -320,17 +397,47 @@ def Score(screen, image, rect,font, white,yellow, BASE_DIR):
         vertical_pos += 40
     pygame.display.update()  
 
-
 def letter_tab(letter):
     return letter[random.randint(0, len(letter)-1)]
 
-def scores_history(BASE_DIR):
-    score_hist= []
-    with open (os.path.join(BASE_DIR,"score.json"), "r") as f:
-            player_list= json.load(f)      
-    for i, player in enumerate(player_list):
-       score_hist.append(f'{i+1}. {player["name"]} => {player["score"]}')
-    return score_hist
+def add_points(score_container, player_name, points):
+    for element in score_container:
+        if element["name"] == player_name:
+            element["score"] += points
+            return score_container
+
+def record_history(score, player_name):
+    # Chemin du fichier score.json
+    score_file = os.path.join(BASE_DIR, "score.json")
+    
+    # Lire les scores existants
+    try:
+        with open(score_file, "r") as f:
+            score_container = json.load(f)
+    except FileNotFoundError:
+        # Si le fichier n'existe pas, initialiser une liste vide
+        score_container = []
+    except json.JSONDecodeError:
+        # Si le fichier est mal formaté, initialiser une liste vide
+        score_container = []
+    
+    # Mettre à jour le score du joueur existant ou ajouter un nouveau joueur
+    player_found = False
+    for player in score_container:
+        if player["name"] == player_name:
+            player["score"] += score
+            player_found = True
+            break
+    
+    if not player_found:
+        score_container.append({"name": player_name, "score": score})
+    
+    # Trier les scores par ordre décroissant
+    score_container = sorted(score_container, key=lambda x: x["score"], reverse=True)
+    
+    # Enregistrer les scores dans le fichier
+    with open(score_file, "w") as f:
+        json.dump(score_container, f, indent=4)  # indent=4 pour un formatage lisible
             
 def main():
     ## variable etat de l'ecran
@@ -383,21 +490,29 @@ def main():
                     elif rect3.collidepoint(event.pos):
                         state_screen = new_game
 
-        # Affichage
+
         if state_screen == Main_Menu:
             Main_menu(screen, image, rect1, rect2, rect3,  Font, WHITE, YELLOW)
         elif state_screen == difficulty:
+
             level_difficulty(screen, image, rect1, rect2, rect3, Font, WHITE, YELLOW)
         elif state_screen == new_game and rect1.collidepoint(event.pos):
+                player_name = get_player_name()
                 ##vitesse du fruit
                 speed = random.randint(2,4)
-                New_Game(screen,image, start_time, game_duration,  score, game_over, missed_fruits,speed)
+                 
+                New_Game(screen,image, start_time, game_duration,  score, game_over, missed_fruits,speed,player_name)
+
         elif state_screen == new_game and rect2.collidepoint(event.pos):
+                player_name = get_player_name()
                 speed= random.randint(5,7)
-                New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed)
+ 
+                New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed,player_name)
         elif state_screen == new_game and rect3.collidepoint(event.pos):
+                player_name = get_player_name()
                 speed= random.randint(7,9)
-                New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed)
+
+                New_Game(screen,image, start_time, game_duration, score, game_over, missed_fruits,speed, player_name)
         elif state_screen == score_hist:
             Score(screen, image, rect4,Font, WHITE,YELLOW, BASE_DIR)
         elif state_screen == Exit:

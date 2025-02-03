@@ -34,6 +34,9 @@ background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREE
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Fruit Ninja")
 
+# game erea
+FRUIT_AREA_MARGIN = 100
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -122,6 +125,8 @@ class Bomb:
     def __init__(self,speed):
         self.image = BOMB_IMAGE
         self.rect = self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
+        x_min = 50 + FRUIT_AREA_MARGIN
+        x_max = SCREEN_WIDTH - 50 - FRUIT_AREA_MARGIN
         self.speed = speed
         self.letter = random.choice(letters) 
         self.cut = False
@@ -141,6 +146,8 @@ class Icecube:
         self.image = pygame.image.load(os.path.join(IMAGE_DIR, "icecube.png"))
         self.cut_image = pygame.image.load(os.path.join(IMAGE_DIR, "ice_cut2.png"))
         self.rect =self.image.get_rect(center=(random.randint(50, SCREEN_WIDTH-50), SCREEN_HEIGHT + 50))
+        x_min = 50 + FRUIT_AREA_MARGIN
+        x_max = SCREEN_WIDTH - 50 - FRUIT_AREA_MARGIN
         self.speed = speed
         self.letter = random.choice(letters)
         self.cut = False
@@ -236,9 +243,9 @@ def select_random_object(speed):
     
     objects_list = [
     Fruit("apple.png", "apple_cut2.png"),
-    Fruit("pineapple.png", "pineapple_cut2.png"),
+    Fruit("pineapple2.png", "pineapple_cut2.png"),
     Fruit("coconut.png", "coco_cut2.png"),
-    Fruit("banana.png", "banana_cut2.png"),
+    Fruit("banana2.png", "banana_cut2.png"),
     Bomb(speed),
     Icecube(speed)]
 
@@ -309,7 +316,7 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
     running = True
     game_over = False
     start_time = pygame.time.get_ticks()
-    game_duration = 100000 
+    game_duration = 60000 
     combo_count=0
     combo_display_time = 0  
     display_combo = False 

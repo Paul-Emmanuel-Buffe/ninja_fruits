@@ -58,7 +58,7 @@ except FileNotFoundError:
     print("La p-olice n'a pas été trouvée. Utilisation de la police par défaut.")
     ubuntu_font = pygame.font.Font(None, 36)
 
-LARGE_FONT = pygame.font.Font(None, 72)
+LARGE_FONT = pygame.font.Font(r"C:\Users\Windows\Desktop\projets\1a\ninja_fruits\Ubuntu-Regular.ttf", 72)
 
 letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 

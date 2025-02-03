@@ -261,6 +261,9 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
     game_over = False
     start_time = pygame.time.get_ticks()
     game_duration = 100000 
+    combo_count=0
+    combo_display_time = 0  
+    display_combo = False 
     
     while running:
             screen.blit(background_image, (0, 0))
@@ -313,6 +316,9 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                 record_history(score, player_name)
                 sword_3.play()
                 main()
+
+
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -326,11 +332,17 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                                     obj.cut = True
                                     obj.cut_time = pygame.time.get_ticks()
                                     score += 1
+                                    combo_count += 1
                                     
+                                    if combo_count == 2:
+                                        score += 20
+                                        combo_count = 0  # Réinitialisation du combo
+                                        combo_display_time = pygame.time.get_ticks()  # Stocke le temps d'apparition
+                                        display_combo = True  # Active l'affichage du combo
+                                                                
                                 elif isinstance(obj, Icecube):
                                     obj.cut = True
                                     obj.cut_time = pygame.time.get_ticks()
-                                    score += 1
                                     
                                 else:
                                     game_over = True  
@@ -340,16 +352,20 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
             if not game_over:
                 if random.randint(1, 60) == 1:
                     objects.append(select_random_object(speed))
-
+            
 # MODIFICATIONS               
                 for obj in objects[:]:
                     obj.move(speed)
                     obj.draw(screen)
                     
-                    if obj.cut and pygame.time.get_ticks() - obj.cut_time > 500:  
+                    if obj.cut and pygame.time.get_ticks() - obj.cut_time > 1000:  
                             if obj.letter not in letters:
+                                combo_count -=1
+                                if combo_count < 0:
+                                    combo_count = 0
                                 letters.append(obj.letter)
                                 objects.remove(obj)
+
 
 
                     if obj.rect.bottom < 0:
@@ -370,14 +386,22 @@ def New_Game(screen,image, start_time, game_duration, score, game_over, missed_f
                         pygame.display.flip()  
                         pygame.time.delay(3000)   
                     break  
-                    
+            
+
+
+            
             score_text = ubuntu_font.render(f"Score: {score}", True, BLACK)
             screen.blit(score_text, (10, 10))
             
             missed_text = ubuntu_font.render(f"Missed: {missed_fruits}", True, BLACK)
             screen.blit(missed_text, (10, 50))
-
-            
+           
+            if display_combo:
+                screen.blit(ubuntu_font.render(f"COMBO + 2", True, WHITE), (10, 100))
+                
+               
+                if pygame.time.get_ticks() - combo_display_time > 2000:
+                    display_combo = False  
             
             pygame.display.flip()
             timer.tick(30)
